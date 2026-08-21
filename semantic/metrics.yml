@@ -1,0 +1,83 @@
+# Karma Edge semantic layer.
+#
+# Metrics are defined ONCE, here. The SQL agent compiles against these
+# definitions instead of inventing column arithmetic per question. This is the
+# single reason the critique loop can tell a broken JOIN from a real business
+# shock: if the metric definition is fixed, a wrong number is a query bug.
+
+metrics:
+  revenue:
+    sql: "SUM(revenue)"
+    source: v_sales_margin
+    grain: [date, sku, store_id]
+    owner: pricing
+    description: Net revenue after discount, before returns.
+
+  units:
+    sql: "SUM(units)"
+    source: v_sales_margin
+    owner: buying
+    description: Units sold.
+
+  cogs:
+    sql: "SUM(cogs)"
+    source: v_sales_margin
+    owner: buying
+    description: Cost of goods sold at standard unit cost.
+
+  gross_margin:
+    sql: "SUM(revenue - cogs)"
+    source: v_sales_margin
+    owner: pricing
+    description: Revenue minus COGS. The number everyone claims to own after it goes up.
+
+  gross_margin_pct:
+    sql: "CASE WHEN SUM(revenue) = 0 THEN NULL ELSE SUM(revenue - cogs) / SUM(revenue) END"
+    source: v_sales_margin
+    owner: pricing
+    description: Margin rate. Guarded against divide-by-zero.
+
+  avg_discount:
+    sql: "AVG(discount)"
+    source: v_sales_margin
+    owner: pricing
+    description: Mean discount depth. Where margin goes to die quietly.
+
+  sell_through:
+    sql: "CAST(SUM(units) AS REAL) / NULLIF(SUM(units) + SUM(on_hand_units), 0)"
+    source: v_sales_margin JOIN inventory USING (date, sku, store_id)
+    owner: supply_chain
+    description: Units sold over units available in period.
+
+  weeks_of_cover:
+    sql: "CAST(SUM(on_hand_units) AS REAL) / NULLIF(AVG(units), 0)"
+    source: inventory JOIN v_sales_margin USING (date, sku, store_id)
+    owner: supply_chain
+    description: On-hand divided by weekly run rate. Under 2 = stockout risk, over 12 = capital in a warehouse.
+
+  pat:
+    sql: "SUM(CASE WHEN account = 'pat' THEN amount ELSE 0 END)"
+    source: gl_entries
+    grain: [period]
+    owner: finance
+    description: Profit after tax as posted to the GL.
+
+  roas:
+    sql: "SUM(attributed_revenue) / NULLIF(SUM(spend), 0)"
+    source: ad_spend
+    owner: ads
+    description: Return on ad spend. The number brands should be paying you to improve.
+
+# Accountability map: which function owns a margin outcome when a finding of
+# this dimension is raised. This is the "name attached to the number".
+ownership:
+  assortment_error: buying
+  overstock: buying
+  stockout: supply_chain
+  lead_time: supply_chain
+  discount_depth: pricing
+  price_position: pricing
+  competitor_undercut: pricing
+  ad_efficiency: ads
+  forecast_error: planning
+  placement: ads

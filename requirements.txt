@@ -1,0 +1,21 @@
+# Karma Edge - core runtime. Pure-python where possible so an old MacBook
+# never has to compile anything.
+langgraph>=0.2.60
+langchain>=0.3.13
+langchain-core>=0.3.28
+langchain-openai>=0.2.14      # used for ALL OpenAI-compatible Chinese providers
+langchain-community>=0.3.13
+pydantic>=2.9
+python-dotenv>=1.0.1
+PyYAML>=6.0.2
+requests>=2.32.3
+beautifulsoup4>=4.12.3
+lxml>=5.3.0
+rank-bm25>=0.2.2              # free keyword retrieval, zero native deps
+tenacity>=8.5.0
+
+# --- optional, install only if you want them -----------------------------
+# chromadb>=0.5.20            # local vector store (RETRIEVAL_MODE=chroma)
+# streamlit>=1.40             # web chat UI: streamlit run app/ui.py
+# statsmodels>=0.14           # unlocks real ARIMA/Holt-Winters in Limitless_TSF
+# pytest>=8.3
