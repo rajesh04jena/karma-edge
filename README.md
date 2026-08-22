@@ -40,7 +40,7 @@ None of these show up as a single "bad decision." They show up eighteen months l
 
 **Karma Edge exists to close that vaccum.** It's a multi-agent AI system that continuously interrogates your sales, inventory, pricing, cashflow, competitor, and ad-spend data the same way a forensic accountant would and assigns **margin accountability down to the SKU level**. Every dollar of margin has an owner. Every risk has a name. Every "we didn't see it coming" excuse gets a lot harder to make.
 
-Because in the end, the question was never complicated: **will the right product be bought, priced, placed, and delivered profitably?** Karma Edge just makes sure the answer is visible before the finance team has to ask it in a very uncomfortable meeting.
+Because in the end, the question was never complicated: **will the right product be bought, priced statistically, placed at the right time, and delivered profitably?** Karma Edge just makes sure the answer is visible before the finance team has to ask it in a very uncomfortable meeting.
 
 > *What goes around, comes around. Karma Edge just gets there faster than your quarterly review.*
 
@@ -140,7 +140,7 @@ flowchart TB
 
 ### The critique loop, in one sentence
 
-The Supervisor routes, a specialist produces numbers with tools, the Critic tries to break them, and only numbers that survive up to **10 rounds** of that get a name attached and land in the ledger — with a **human gate** for anything at or above $250k of annualised impact.
+The Supervisor routes, a specialist produces numbers with tools, the Critic tries to break them, and only numbers that survive up to **10 rounds** of that get a name attached and land in the ledger — with a **human gate** for reporting the correct annualised impact.
 
 ```mermaid
 sequenceDiagram
@@ -171,7 +171,7 @@ Karma Edge doesn't default to "embed everything." Following a vectorless-RAG-fir
 | Query type | Retriever used | Why |
 |---|---|---|
 | "What was margin for SKU X last week?" | `semantic_metric` / `sql_query` | Structured, exact answer needed |
-| "What does the markdown policy say about small appliances?" | BM25 keyword over markdown policy docs | Structured doc, no need for embeddings |
+| "What does the marketing receipt say about OOH spending on new stores?" | BM25 keyword over agency receipt docs | Structured doc, no need for embeddings |
 | "Summarize competitor pricing narrative for Brand Y" | Live fetch + long-context read (Chroma optional) | Unstructured, fuzzy, paraphrase-heavy |
 | "Which SKUs are at stockout risk?" | `sql_query` + `forecast_series` + `inventory_health` | Numeric + predictive |
 
@@ -206,7 +206,7 @@ Each specialist is a LangGraph **ReAct sub-agent** (`create_react_agent`) with i
 ### 📊 data_analyst
 Read-only SQL over the warehouse plus a **semantic metric layer**. Won't invent column arithmetic: metrics are defined once in `semantic/metrics.yml` and compiled from there, which is precisely why the Critic can tell a broken JOIN from a real business shock. Reports rate **and** dollars, always, because margin rate can improve while margin dollars collapse.
 
-**Tools:** `sql_query` (SELECT-only, statement-guarded, single-statement) · `semantic_metric` · `list_metrics` · `search_policy`
+**Tools:** `sql_query` (SELECT-only, statement-guarded) · `semantic_metric` · `list_metrics` · `search_policy`
 
 ### 🔮 forecaster
 Owns every forward-looking number. Embeds the [`Limitless_TSF`](https://github.com/rajesh04jena/Limitless) model family: Holt-Winters (additive triple exponential smoothing), seasonal naive, Theta(0,2), and Holt's linear trend — with **automatic model selection by holdout MAPE**, not by vibes. If you `pip install limitless-tsf` (and `statsmodels`), the real ARIMA/Prophet/XGBoost engines take over transparently; the tool contract never changes. Every forecast reports its selected model, its backtest error, and an 80% interval. A forecast without an error estimate is an opinion.
@@ -404,7 +404,7 @@ Honesty, since the whole project is about accountability:
 | Append-only ledger with ownership derivation | **real, tested** |
 | BM25 retrieval over policy corpus | **real, tested** |
 | Autonomous competitor discovery + scraping | **real**, network-dependent — untested in CI by design; JS-heavy sites need Playwright (see ARCHITECTURE.md) |
-| Demo warehouse data | **synthetic**, with deliberately planted saboteurs so the agents have something to find |
+| Demo Data | **synthetic**, with deliberately planted saboteurs so the agents have something to find |
 | Ads / OOH agent from the original concept | **not built yet** — the ownership map reserves `ads` and `placement`; wire it as a sixth specialist |
 
 ---
