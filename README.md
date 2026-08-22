@@ -7,7 +7,7 @@ Karma Edge uncovers the real culprits before a spreadsheet error metastasizes in
 
 **Manufacturers win, suppliers win, and retailers inherit the crumbs, the losses, and an emergency strategy restructure because: chaos always pays someone.**
 
-The only real issue is whether proactive engineering can dethrone the actors hiding behind their untouchable status and their self-issued "no accountability" crown, before it spirals into a full-blown blame-game war?
+The only real issue is whether proactive engineering can dethrone the actors hiding behind their untouchable status and their self-issued "no accountability" crown, before it spirals into a full-blown blame-game war
 
 
 <p align="center">
